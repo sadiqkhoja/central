@@ -21,7 +21,11 @@ fi
 
 echo "writing a new nginx configuration file.."
 CNAME=$([ "$SSL_TYPE" = "customssl" ] && echo "local" || echo "$DOMAIN") \
-/bin/bash -c "envsubst '\$SSL_TYPE \$CNAME' < /usr/share/nginx/odk.conf.template > /etc/nginx/conf.d/odk.conf"
+/bin/bash -c "envsubst '\$SSL_TYPE \$CNAME \$DOMAIN' < /usr/share/nginx/odk.conf.template > /etc/nginx/conf.d/odk.conf"
+
+echo "write a new nginx configuration file for admin site"
+CNAME=$([ "$SSL_TYPE" = "customssl" ] && echo "local" || echo "$DOMAIN") \
+/bin/bash -c "envsubst '\$SSL_TYPE \$CNAME \$ADMINDOMAIN' < /usr/share/nginx/adminsite.conf.template > /etc/nginx/conf.d/adminsite.conf"
 
 if [ "$SSL_TYPE" = "letsencrypt" ]
 then

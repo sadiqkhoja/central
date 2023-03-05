@@ -1,14 +1,5 @@
 version: "3"
 services:
-  postgres:
-    image: "postgres:9.6"
-    volumes:
-      - /var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: odk
-      POSTGRES_PASSWORD: odk
-      POSTGRES_DATABASE: odk
-    restart: always
   mail:
     image: "itsissa/namshi-smtp:4.92-8.deb10u6"
     volumes:
@@ -17,13 +8,15 @@ services:
     environment:
       - MAILNAME=${DOMAIN}
     restart: always
+  iic-auth:
+    build:
+      context: iic-odk-auth/iic-odk-auth
   service:
     build:
       context: .
       dockerfile: service.dockerfile
     depends_on:
       - secrets
-      - postgres
       - mail
       - pyxform
       - enketo
@@ -48,6 +41,7 @@ services:
     environment:
       - SSL_TYPE=${SSL_TYPE:-letsencrypt}
       - DOMAIN=${DOMAIN}
+      - ADMINDOMAIN=${ADMINDOMAIN}
       - CERTBOT_EMAIL=${SYSADMIN_EMAIL}
     ports:
       - "${HTTP_PORT:-80}:80"

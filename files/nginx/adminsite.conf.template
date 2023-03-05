@@ -1,6 +1,6 @@
 server {
   listen 443 ssl;
-  server_name ${DOMAIN};
+  server_name ${ADMINDOMAIN};
 
   ssl_certificate /etc/${SSL_TYPE}/live/${CNAME}/fullchain.pem;
   ssl_certificate_key /etc/${SSL_TYPE}/live/${CNAME}/privkey.pem;
@@ -25,7 +25,6 @@ server {
   gzip_types text/plain text/css application/json application/x-javascript text/xml text/csv;
 
   location /- {
-    rewrite ^/-/media/.*/([^/]*).xml$ /Media/$1;
     proxy_pass http://enketo:8005/-;
     proxy_redirect off;
     proxy_set_header Host $host;
@@ -62,11 +61,16 @@ server {
   }
 
   location / {
-    proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header   X-Forwarded-Proto $scheme;
-    proxy_pass http://iic-auth:5000/;
-    proxy_redirect off;
-    proxy_set_header Host $host;
+    root /usr/share/nginx/html;
+
+    location /version.txt {
+      include /usr/share/nginx/common-headers.nginx.conf;
+      add_header Cache-Control no-cache;
+    }
+    location /index.html {
+      include /usr/share/nginx/common-headers.nginx.conf;
+      add_header Cache-Control no-cache;
+    }
   }
 
   location /csp-report {
